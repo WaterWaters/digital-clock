@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Digital-Clock</title>
+  <link rel="stylesheet" href="digit_clock.css">
+</head>
+<body>
+<div class="weekday">
+  <div class="w_day" id="m">M</div>
+  <div class="w_day" id="t">T</div>
+  <div class="w_day" id="w">W</div>
+  <div class="w_day" id="r">R</div>
+  <div class="w_day" id="f">F</div>
+  <div class="w_day" id="s">S</div>
+  <div class="w_day" id="u">S</div>
+</div>
+<div class="clock">
+  <div class="digit" id="hour_front">
+    <div class="rectangle sharp-rectangle up"></div>
+    <div class="rectangle arrow-rectangle up_left"></div>
+    <div class="rectangle arrow-rectangle up_right"></div>
+    <div class="rectangle sharp-rectangle mid"></div>
+    <div class="rectangle arrow-rectangle down_left"></div>
+    <div class="rectangle arrow-rectangle down_right"></div>
+    <div class="rectangle sharp-rectangle bottom"></div>
+  </div>
+  <div class="digit" id="hour_back">
+    <div class="rectangle sharp-rectangle up"></div>
+    <div class="rectangle arrow-rectangle up_left"></div>
+    <div class="rectangle arrow-rectangle up_right"></div>
+    <div class="rectangle sharp-rectangle mid"></div>
+    <div class="rectangle arrow-rectangle down_left"></div>
+    <div class="rectangle arrow-rectangle down_right"></div>
+    <div class="rectangle sharp-rectangle bottom"></div>
+  </div>
+  <div class="digit">
+    <div class="dot" style="top: 15px"></div>
+    <div class="dot" style="top: 45px"></div>
+  </div>
+  <div class="digit" id="minute_front">
+    <div class="rectangle sharp-rectangle up"></div>
+    <div class="rectangle arrow-rectangle up_left"></div>
+    <div class="rectangle arrow-rectangle up_right"></div>
+    <div class="rectangle sharp-rectangle mid"></div>
+    <div class="rectangle arrow-rectangle down_left"></div>
+    <div class="rectangle arrow-rectangle down_right"></div>
+    <div class="rectangle sharp-rectangle bottom"></div>
+  </div>
+  <div class="digit" id="minute_back">
+    <div class="rectangle sharp-rectangle up"></div>
+    <div class="rectangle arrow-rectangle up_left"></div>
+    <div class="rectangle arrow-rectangle up_right"></div>
+    <div class="rectangle sharp-rectangle mid"></div>
+    <div class="rectangle arrow-rectangle down_left"></div>
+    <div class="rectangle arrow-rectangle down_right"></div>
+    <div class="rectangle sharp-rectangle bottom"></div>
+  </div>
+  <div class="digit">
+    <div class="dot" style="top: 15px"></div>
+    <div class="dot" style="top: 45px"></div>
+  </div>
+  <div class="digit" id="second_front">
+    <div class="rectangle sharp-rectangle up"></div>
+    <div class="rectangle arrow-rectangle up_left"></div>
+    <div class="rectangle arrow-rectangle up_right"></div>
+    <div class="rectangle sharp-rectangle mid"></div>
+    <div class="rectangle arrow-rectangle down_left"></div>
+    <div class="rectangle arrow-rectangle down_right"></div>
+    <div class="rectangle sharp-rectangle bottom"></div>
+  </div>
+  <div class="digit" id="second_back">
+    <div class="rectangle sharp-rectangle up"></div>
+    <div class="rectangle arrow-rectangle up_left"></div>
+    <div class="rectangle arrow-rectangle up_right"></div>
+    <div class="rectangle sharp-rectangle mid"></div>
+    <div class="rectangle arrow-rectangle down_left"></div>
+    <div class="rectangle arrow-rectangle down_right"></div>
+    <div class="rectangle sharp-rectangle bottom"></div>
+  </div>
+</div>
+<div class="calender" id="calender">--/--/----</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
+<script>
+  const numberClasses = {
+    "0": ["mid"],
+    "1": ["up", "up_left", "down_left", "mid", "bottom"],
+    "2": ["up_left", "down_right"],
+    "3": ["up_left", "down_left"],
+    "4": ["up", "down_left", "bottom"],
+    "5": ["up_right", "down_left"],
+    "6": ["up_right"],
+    "7": ["up_left", "mid", "down_left", "bottom"],
+    "8": [""],
+    "9": ["down_left"]
+  };
+
+  let g_hours = "--";
+  let g_minutes = "--";
+  let g_seconds = "--";
+
+  function switch_light(tag, number) {
+    const numberClass = numberClasses[number];
+    tag.children().removeClass("off");
+    numberClass.forEach(className => {
+      if (className !== "") {
+        tag.find("." + className).addClass("off");
+      }
+    });
+  }
+
+  setInterval(function () {
+    const now = new Date();
+    let seconds = now.getSeconds();
+    seconds = ("0" + seconds).slice(-2);
+    if (g_seconds[0] !== seconds[0]) {
+      switch_light($("#second_front"), seconds[0]);
+      g_seconds = seconds[0] + g_seconds[1];
+    }
+    switch_light($("#second_back"), seconds[1]);
+  }, 1000);
+
+  function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+
+    hours = ("0" + hours).slice(-2);
+    minutes = ("0" + minutes).slice(-2);
+
+    if (g_hours[0] !== hours[0]) {
+      switch_light($("#hour_front"), hours[0]);
+      g_hours = hours[0] + g_hours[1];
+    }
+
+    if (g_hours[1] !== hours[1]) {
+      switch_light($("#hour_back"), hours[1]);
+      g_hours = g_hours[0] + hours[1];
+    }
+
+    if (g_minutes[0] !== minutes[0]) {
+      switch_light($("#minute_front"), minutes[0]);
+      g_minutes = minutes[0] + g_minutes[1];
+    }
+
+    if (g_minutes[1] !== minutes[1]) {
+      switch_light($("#minute_back"), minutes[1]);
+      g_minutes = g_minutes[0] + minutes[1];
+    }
+  }
+
+  setInterval(updateClock, 1000);
+
+  const weekDay = {
+    0: "u",
+    1: "m",
+    2: "t",
+    3: "w",
+    4: "r",
+    5: "f",
+    6: "s"
+  };
+
+  let currentWeekday = -1;
+
+  setInterval(function () {
+    const dayOfWeek = new Date().getDay();
+
+    if (dayOfWeek !== currentWeekday) {
+      if (currentWeekday !== -1) {
+        $("#" + weekDay[currentWeekday]).removeClass("active");
+      }
+      $("#" + weekDay[dayOfWeek]).addClass("active");
+      currentWeekday = dayOfWeek;
+    }
+  }, 1000);
+
+  setInterval(function () {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = ("0" + (date.getMonth() + 1)).slice(-2);
+    const day = ("0" + date.getDate()).slice(-2);
+    const fullDate = month + "/" + day + "/" + year;
+    const calendarElement = $("#calender");
+    if (fullDate !== calendarElement.html()) {
+      calendarElement.html(fullDate);
+    }
+  }, 1000);
+</script>
+</html>
